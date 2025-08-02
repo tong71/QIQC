@@ -161,30 +161,52 @@ if file:
     model_used = None
     anomaly_score = None
     threshold = None
+
     if (n_questions > 10) and (n_samples > 100):
-        model_used = "Autoencoder (需另行客製實作)"
-        st.warning("Autoencoder 屬深度學習模型，需客製，這裡預設用 Isolation Forest 示範")
-        # 預設用 Isolation Forest 以方便測試
+        model_used = "Autoencoder"
+        st.success("已自動選用 Autoencoder 異常檢測模型")
     elif (5 <= n_questions <= 20) and (30 <= n_samples <= 100):
         model_used = "Isolation Forest"
+        st.success("已自動選用 Isolation Forest 異常檢測模型")
     elif n_samples < 30:
         model_used = None
         st.info("樣本過少，不進行異常填答檢測")
     else:
         model_used = "Isolation Forest"
+        st.success("已自動選用 Isolation Forest 異常檢測模型")
+
+    X = StandardScaler().fit_transform(dfq.values)
+
     if model_used == "Isolation Forest":
-        X = StandardScaler().fit_transform(dfq)
         iso = IsolationForest(random_state=42)
         preds = iso.fit_predict(X)
         anomaly_score = -iso.decision_function(X)
-        st.success("已自動選用 Isolation Forest 異常檢測模型")
-    elif model_used == "Autoencoder (需另行客製實作)":
-        st.info("Autoencoder 模型未預設實作，需自訂。")
+    elif model_used == "Autoencoder":
+        # --- Autoencoder 主體 ---
+        import tensorflow as tf
+        from tensorflow import keras
+        from tensorflow.keras import layers
+
+        input_dim = X.shape[1]
+        encoding_dim = max(2, input_dim // 2)
+
+        input_layer = keras.Input(shape=(input_dim,))
+        encoded = layers.Dense(encoding_dim, activation='relu')(input_layer)
+        decoded = layers.Dense(input_dim, activation='linear')(encoded)
+        autoencoder = keras.Model(inputs=input_layer, outputs=decoded)
+        autoencoder.compile(optimizer='adam', loss='mse')
+
+        autoencoder.fit(X, X, epochs=40, batch_size=16, verbose=0)
+
+        X_pred = autoencoder.predict(X)
+        anomaly_score = np.mean(np.square(X - X_pred), axis=1)  # MSE 作為異常分數
+
+    # ========== 顯示分數、門檻、可視化 ==========
     if anomaly_score is not None:
         st.write("各樣本異常分數（越高越異常）：")
         st.dataframe(pd.DataFrame({"異常分數": anomaly_score}), hide_index=True)
         threshold = np.percentile(anomaly_score, 95)
-        st.write(f"建議異常門檻（95百分位）：**{threshold:.2f}**")
+        st.write(f"建議異常門檻（95百分位）：**{threshold:.4f}**")
         anomaly_flag = anomaly_score > threshold
 
         # 直方圖
@@ -194,7 +216,7 @@ if file:
         ax2.set_title("異常分數分布")
         ax2.legend()
         st.pyplot(fig2)
-
+        
         # ===== Step 7: 降維視覺化 (UMAP) =====
         st.header("Step 6. 降維視覺化與異常樣本標記 (UMAP)")
         reducer = umap.UMAP(random_state=42)
@@ -204,5 +226,6 @@ if file:
         plt.title("填答樣本降維視覺化（紅=疑似異常）")
         st.pyplot(plt)
         st.write("點選表格可進一步查看疑似異常填答者原始資料。")
+        st.write("疑似異常樣本ID：", list(np.where(anomaly_flag)[0]))
 else:
     st.info("請先上傳問卷資料檔案。")
