@@ -13,7 +13,7 @@ btn = st.button("自動生成Likert題目")
 def get_pipe():
     return pipeline(
         "text-generation",
-        model="Qwen/Qwen1.5-7B-Chat",
+        model="Qwen/Qwen1.5-0.5B-Chat",
         device_map="auto",  # 若有GPU自動用，沒GPU自動用CPU
         trust_remote_code=True
     )
