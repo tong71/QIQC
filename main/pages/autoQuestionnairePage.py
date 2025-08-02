@@ -10,7 +10,7 @@ questions_per_factor = st.number_input("每個因子需要幾題？", min_value=
 btn = st.button("自動生成Likert題目")
 
 # ==== HuggingFace API 設定 ====
-API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct"
+API_URL = "https://api-inference.huggingface.co/models/Qwen/QwQ-32B-Preview"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 
 # 可以選擇註解掉下面這行，僅測試API狀態用
