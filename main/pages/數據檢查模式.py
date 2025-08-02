@@ -7,26 +7,6 @@ from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 import seaborn as sns
 import umap
-import matplotlib
-import matplotlib.pyplot as plt
-
-# 自動尋找中文字型
-def set_chinese_font():
-    import os
-    font_candidates = [
-        "Noto Sans CJK TC", "Noto Sans CJK JP", "SimHei", "Microsoft JhengHei", "PMingLiU", "STHeiti", "Arial Unicode MS"
-    ]
-    for font in font_candidates:
-        if font in set(f.name for f in matplotlib.font_manager.fontManager.ttflist):
-            plt.rcParams['font.family'] = font
-            plt.rcParams['axes.unicode_minus'] = False
-            return
-    # 找不到則用 DejaVu Sans, 但警告
-    plt.rcParams['font.family'] = 'DejaVu Sans'
-    plt.rcParams['axes.unicode_minus'] = False
-
-set_chinese_font()
-
 
 st.title("驗證模式：資料檢驗與異常填答偵測")
 st.markdown("""
@@ -233,8 +213,10 @@ if file:
         # 直方圖
         fig2, ax2 = plt.subplots()
         sns.histplot(anomaly_score, bins=20, ax=ax2, color="blue")
-        ax2.axvline(threshold, color="red", linestyle="--", label="異常門檻")
-        ax2.set_title("異常分數分布")
+        ax2.axvline(threshold, color="red", linestyle="--", label="Anomaly threshold")
+        ax2.set_title("Distribution of Anomaly Scores")
+        ax2.set_xlabel("Anomaly Score")
+        ax2.set_ylabel("Count")
         ax2.legend()
         st.pyplot(fig2)
         
@@ -244,7 +226,9 @@ if file:
         embedding = reducer.fit_transform(X)
         plt.figure(figsize=(6,4))
         plt.scatter(embedding[:,0], embedding[:,1], c=anomaly_flag, cmap="coolwarm", s=40, alpha=0.8)
-        plt.title("填答樣本降維視覺化（紅=疑似異常）")
+        plt.title("UMAP Visualization of Responses (Red = Anomaly)")
+        plt.xlabel("UMAP Dimension 1")
+        plt.ylabel("UMAP Dimension 2")
         st.pyplot(plt)
         st.write("點選表格可進一步查看疑似異常填答者原始資料。")
         st.write("疑似異常樣本ID：", list(np.where(anomaly_flag)[0]))
