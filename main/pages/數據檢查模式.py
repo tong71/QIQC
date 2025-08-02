@@ -7,6 +7,27 @@ from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 import seaborn as sns
 import umap
+import matplotlib
+import matplotlib.pyplot as plt
+
+# 自動尋找中文字型
+def set_chinese_font():
+    import os
+    font_candidates = [
+        "Noto Sans CJK TC", "Noto Sans CJK JP", "SimHei", "Microsoft JhengHei", "PMingLiU", "STHeiti", "Arial Unicode MS"
+    ]
+    for font in font_candidates:
+        if font in set(f.name for f in matplotlib.font_manager.fontManager.ttflist):
+            plt.rcParams['font.family'] = font
+            plt.rcParams['axes.unicode_minus'] = False
+            return
+    # 找不到則用 DejaVu Sans, 但警告
+    plt.rcParams['font.family'] = 'DejaVu Sans'
+    plt.rcParams['axes.unicode_minus'] = False
+
+set_chinese_font()
+
+
 st.title("驗證模式：資料檢驗與異常填答偵測")
 st.markdown("""
 依照下列步驟，進行問卷資料驗證及異常填答檢測，提升量表科學性與資料品質。
