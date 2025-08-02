@@ -7,7 +7,7 @@ from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 import seaborn as sns
 import umap
-st.title("驗證階段：資料檢驗與異常填答偵測")
+st.title("驗證模式：資料檢驗與異常填答偵測")
 st.markdown("""
 依照下列步驟，進行問卷資料驗證及異常填答檢測，提升量表科學性與資料品質。
 """)

@@ -4,7 +4,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-st.title("出題階段：語意分析與重複題預防")
+st.title("出題模式：語意分析與重複題預防")
 st.markdown("""
 QIQC 可協助你分析 Likert 題庫，**自動標記語意過高重疊/類似題**，提升問卷效度。  
 依下列步驟操作：
