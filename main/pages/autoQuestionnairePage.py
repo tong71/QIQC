@@ -15,8 +15,7 @@ headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 
 def generate_likert_items(subject, factor, n):
     prompt = (
-        f"請以「{subject}」為主題，為「{factor}」這個因子生成{n}個Likert問卷題目，每題用第一人稱陳述句（例如「我覺得…」），適合用於心理測驗或社會科學問卷。"
-        "請直接給每個題目，勿加註解。"
+    f"請用繁體中文，以「{subject}」為主題，為「{factor}」這個因子生成{n}個Likert問卷題目，每題用第一人稱陳述句（例如「我覺得…」），適合心理測驗或社會科學問卷，每題單獨一行，勿加說明。"
     )
     payload = {
         "inputs": prompt,
