@@ -1,0 +1,12 @@
+sentence-transformers
+scikit-learn
+pandas
+streamlit
+matplotlib
+openpyxl
+scipy
+seaborn
+factor_analyzer
+umap-learn
+torch
+joblib
