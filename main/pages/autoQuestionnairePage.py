@@ -1,7 +1,7 @@
 import streamlit as st
-import requests
+from transformers import pipeline
 
-st.title("AI自動生成Likert問卷題目 (HuggingFace API)")
+st.title("AI自動生成Likert問卷題目 (本地 LLM)")
 
 # ==== 使用者輸入 ====
 subject = st.text_input("請輸入問卷主題（如：學習動機、工作壓力）")
@@ -9,47 +9,32 @@ factors = st.text_input("請輸入要測量的因子名稱（多個用逗號分�
 questions_per_factor = st.number_input("每個因子需要幾題？", min_value=1, max_value=10, value=3, step=1)
 btn = st.button("自動生成Likert題目")
 
-# ==== HuggingFace API 設定 ====
-API_URL = "https://api-inference.huggingface.co/models/Qwen/QwQ-32B-Preview"
-headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
+@st.cache_resource(show_spinner="正在加載大語言模型，請稍候...")
+def get_pipe():
+    return pipeline(
+        "text-generation",
+        model="Qwen/Qwen1.5-7B-Chat",
+        device_map="auto",  # 若有GPU自動用，沒GPU自動用CPU
+        trust_remote_code=True
+    )
 
-# 可以選擇註解掉下面這行，僅測試API狀態用
-resp = requests.get(API_URL, headers=headers)
-st.write("API status code: ", resp.status_code)
-st.write("API response: ", resp.text)
-
-def generate_likert_items(subject, factor, n):
+def generate_likert_items(subject, factor, n, pipe):
     prompt = (
         f"請用繁體中文，以「{subject}」為主題，為「{factor}」這個因子生成{n}個Likert問卷題目，每題用第一人稱陳述句（例如「我覺得…」），適合心理測驗或社會科學問卷，每題單獨一行，勿加說明。"
     )
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": 256,
-            "do_sample": True,
-            "temperature": 0.7
-        }
-    }
-    response = requests.post(API_URL, headers=headers, json=payload, timeout=60)
-    if response.status_code == 200:
-        output = response.json()
-        # HuggingFace 會回傳一個list，裡面每個元素是 dict
-        if isinstance(output, list) and 'generated_text' in output[0]:
-            text = output[0]['generated_text']
-        elif isinstance(output, dict) and 'generated_text' in output:
-            text = output['generated_text']
-        else:
-            text = str(output)
-        items = [line for line in text.split('\n') if line.strip()]
-        return items
-    else:
-        return [f"API Error: {response.status_code}", response.text]
+    output = pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.7)
+    text = output[0]['generated_text']
+    # 通常模型會把 prompt+回應合併，這裡只取回應
+    answer = text.replace(prompt, '').strip()
+    items = [line for line in answer.split('\n') if line.strip()]
+    return items
 
 if btn and subject and factors:
     st.info("AI生成中，請稍候...")
+    pipe = get_pipe()
     all_questions = []
     for factor in [f.strip() for f in factors.split(',') if f.strip()]:
-        items = generate_likert_items(subject, factor, questions_per_factor)
+        items = generate_likert_items(subject, factor, questions_per_factor, pipe)
         st.markdown(f"**{factor}** 因子題目：")
         for q in items:
             st.write(q)

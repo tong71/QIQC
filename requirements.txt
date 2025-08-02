@@ -10,3 +10,5 @@ factor_analyzer
 umap-learn>=0.5.6
 torch
 joblib
+transformers
+accelerate
