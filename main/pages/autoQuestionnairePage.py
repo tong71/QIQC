@@ -9,7 +9,7 @@ factors = st.text_input("請輸入要測量的因子名稱（多個用逗號分�
 questions_per_factor = st.number_input("每個因子需要幾題？", min_value=1, max_value=10, value=3, step=1)
 btn = st.button("自動生成Likert題目")
 # ==== HuggingFace API 設定 ====
-API_URL = "https://api-inference.huggingface.co/models/HuggingFaceTB/SmolLM3-3B"
+API_URL = "https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-en-fr"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 resp = requests.get(API_URL, headers=headers)
 st.write("resp.status_code: ", resp.status_code)
