@@ -8,16 +8,15 @@ subject = st.text_input("請輸入問卷主題（如：學習動機、工作壓�
 factors = st.text_input("請輸入要測量的因子名稱（多個用逗號分隔，如：自信心, 壓力調適, 動機）")
 questions_per_factor = st.number_input("每個因子需要幾題？", min_value=1, max_value=10, value=3, step=1)
 btn = st.button("自動生成Likert題目")
-
-# ==== HuggingFace API 設定 ====
 # ==== HuggingFace API 設定 ====
 API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 
 
 resp = requests.get(API_URL, headers=headers)
-print(resp.status_code)
-print(resp.text)
+print("resp.status_code: ", resp.status_code)
+print("resp.text: ", resp.text)
+
 
 def generate_likert_items(subject, factor, n):
     prompt = (
