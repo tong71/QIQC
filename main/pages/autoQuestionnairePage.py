@@ -10,11 +10,12 @@ questions_per_factor = st.number_input("每個因子需要幾題？", min_value=
 btn = st.button("自動生成Likert題目")
 
 # ==== HuggingFace API 設定 ====
-API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
+# ==== HuggingFace API 設定 ====
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 
 
-resp = requests.get("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", headers=headers)
+resp = requests.get(API_URL, headers=headers)
 print(resp.status_code)
 print(resp.text)
 
