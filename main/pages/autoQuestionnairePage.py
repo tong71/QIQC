@@ -13,20 +13,25 @@ btn = st.button("自動生成Likert題目")
 def get_pipe():
     return pipeline(
         "text-generation",
-        model="Qwen/Qwen1.5-0.5B-Chat",
-        device_map="auto",  # 若有GPU自動用，沒GPU自動用CPU
+        model="Qwen/Qwen1.5-7B-Chat"",   # 你若有更大RAM可改 "Qwen/Qwen1.5-7B-Chat"
+        device_map="auto",
         trust_remote_code=True
     )
 
 def generate_likert_items(subject, factor, n, pipe):
     prompt = (
-        f"請用繁體中文，以「{subject}」為主題，為「{factor}」這個因子生成{n}個Likert問卷題目，每題用第一人稱陳述句（例如「我覺得…」），適合心理測驗或社會科學問卷，每題單獨一行，勿加說明。"
+        f"請用繁體中文，以「{subject}」為主題，為「{factor}」這個因子生成{n}個Likert問卷題目，每題以「我」開頭，"
+        "請直接列出題目，每題一行，並在每題前標上阿拉伯數字序號。例如：\n1. 我覺得…\n2. 我認為…\n勿加任何說明。"
     )
     output = pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.7)
     text = output[0]['generated_text']
-    # 通常模型會把 prompt+回應合併，這裡只取回應
+    st.write("【DEBUG】模型原始回應：", text)  # 顯示模型原始輸出方便debug
+
+    # 處理回應內容：移除 prompt、只留回應
     answer = text.replace(prompt, '').strip()
     items = [line for line in answer.split('\n') if line.strip()]
+
+    st.write("【DEBUG】切分後的題目清單：", items)  # debug顯示
     return items
 
 if btn and subject and factors:
