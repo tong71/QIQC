@@ -7,6 +7,7 @@ from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 import seaborn as sns
 import umap
+st.set_page_config(page_title="驗證模式", page_icon="🧐")
 
 st.title("驗證階段：資料檢驗與異常填答偵測")
 st.markdown("""
