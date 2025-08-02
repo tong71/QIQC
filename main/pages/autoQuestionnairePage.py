@@ -11,11 +11,9 @@ btn = st.button("自動生成Likert題目")
 # ==== HuggingFace API 設定 ====
 API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
-
-
 resp = requests.get(API_URL, headers=headers)
-print("resp.status_code: ", resp.status_code)
-print("resp.text: ", resp.text)
+st.write("resp.status_code: ", resp.status_code)
+st.write("resp.text: ", resp.text)
 
 
 def generate_likert_items(subject, factor, n):
