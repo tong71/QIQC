@@ -13,7 +13,7 @@ btn = st.button("自動生成Likert題目")
 API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
 headers = {"Authorization": f"Bearer {st.secrets['huggingface']['api_key']}"}
 
-headers = {"Authorization": f"Bearer hf_你的token"}
+
 resp = requests.get("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", headers=headers)
 print(resp.status_code)
 print(resp.text)
