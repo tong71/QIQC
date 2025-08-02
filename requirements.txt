@@ -7,6 +7,6 @@ openpyxl
 scipy
 seaborn
 factor_analyzer
-umap-learn
+umap-learn>=0.5.6
 torch
 joblib
